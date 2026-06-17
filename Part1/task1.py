@@ -34,17 +34,31 @@ def simulate_patients(P, num_patients, initial_state):
     return all_states, all_months
 
 def task1():
-    initial_state = 1
-    death_months = simulate_patients(P, 1000, initial_state)[1]
+    initial_state = 0
+    patients = 1000
+
+    states ,death_months = simulate_patients(P, patients, initial_state)
+
     death_years = np.round(np.array(death_months) / 12, 1)
-    print(np.max(death_months))
-    print(np.min(death_months))
-    print(np.mean(death_months))
 
-    print(np.max(death_years))
-    print(np.min(death_years))
-    print(np.mean(death_years))
 
+
+    print(f'Longest months lived : {np.max(death_months)}')
+    print(f'Shortest months lived : {np.min(death_months)}')
+    print(f'Mean months lived : {np.mean(death_months)}')
+    print(f'Median months lived : {np.median(death_months)}')
+    print("-" * 50)
+    print(f'longest lived (years) : {max(death_months)}')
+    print(f'shortest lived (years) : {min(death_months)}')
+    print(f'mean time lived (years) : {np.mean(death_months)}')
+    print("-"*50)
+    state1 = 0
+    for state in states:
+        for event in state:
+            if event == 1:
+                state1 += 1
+                break
+    print(f'Proportion of women, where the cancer reappears locally : {(state1 / patients) * 100}%')
     plt.hist(death_years, bins=range(0, int(max(death_years) + 1), 1), edgecolor='black')
     plt.title('Distribution of Years Until Death')
     plt.xlabel('Years Until Death')
@@ -61,5 +75,5 @@ def task1():
 
 
 if __name__ == "__main__":
-    task1() #TODO find proportion of state 1 to state 2 
+    task1() #TODO find proportion of state 1 to state 2
 
