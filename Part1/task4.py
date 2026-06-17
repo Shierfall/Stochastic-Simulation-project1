@@ -48,6 +48,9 @@ def task4():
     print(f'Median Lifetime where cancer has reappeared within the first 12 months: {np.median(months)}')
 
     plt.hist(np.array(months)/12, bins=30, edgecolor='black')
+    plt.xlabel('Lifetime (years)')
+    plt.ylabel('Number of women')
+    plt.title('Lifetime Distribution (Cancer Reappeared Within First 12 Months)')
     plt.show()
 
 if __name__ == "__main__":
