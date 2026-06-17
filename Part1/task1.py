@@ -42,7 +42,8 @@ def task1():
     death_years = np.round(np.array(death_months) / 12, 1)
 
 
-
+    print(f'Initial state: {initial_state} and number of patients: {patients}')
+    print("-"*50)
     print(f'Longest months lived : {np.max(death_months)}')
     print(f'Shortest months lived : {np.min(death_months)}')
     print(f'Mean months lived : {np.mean(death_months)}')
@@ -76,4 +77,5 @@ def task1():
 
 if __name__ == "__main__":
     task1() #TODO find proportion of state 1 to state 2
+
 
