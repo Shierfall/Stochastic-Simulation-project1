@@ -6,7 +6,7 @@ P_s = np.array([
     [0,      0,     0.992,  0.003],
     [0,      0,     0,      0.991],
 ])
-pi  = np.array([1, 0, 0, 0])                    # distribution at t=0
+pi  = np.array([1, 0, 0, 0])              # distribution at t=0
 p_s = np.array([0.001, 0.005, 0.005, 0.009])    # death column of P
 ones = np.ones(4)
 
@@ -94,4 +94,6 @@ def task3_test(bin_width=48):
     print(f"bins: {len(obs)}  chi2: {chi2:.4f}  p: {pval:.4f}  dof: {len(obs)-1}")
     return chi2, pval
 
-task3_test()
+if "__name__" == "__main__":
+    task3()
+    task3_test()
