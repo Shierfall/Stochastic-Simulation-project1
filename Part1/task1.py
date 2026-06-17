@@ -76,6 +76,6 @@ def task1():
 
 
 if __name__ == "__main__":
-    task1() #TODO find proportion of state 1 to state 2
+    task1()
 
 
