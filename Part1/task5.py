@@ -34,7 +34,7 @@ def simulate_patients(P, num_patients, initial_state):
 
 def theoretical_mean(P):
     Ps = np.array(P)[:4, :4]
-    pi = np.array([1, 0, 0, 0], dtype=float)
+    pi = np.array([1, 0, 0, 0])
     return pi @ np.linalg.inv(np.eye(4) - Ps) @ np.ones(4)
 
 def control_variates(X, Z, mu_Z):
