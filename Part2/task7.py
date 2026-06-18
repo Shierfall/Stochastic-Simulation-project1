@@ -10,7 +10,7 @@ Q = np.array([[-0.0085, 0.005,  0.0025, 0,      0.001],
      [0,        0,      0,      0,      0    ]])
 DEATH = 4
 N_STATES = len(Q)
-rng = np.random.default_rng(134214)
+rng = np.random.default_rng(12)
 def simulate_ctmc(Q, n_women, rng, start=0):
     lifetimes = np.zeros(n_women)
     all_states = []

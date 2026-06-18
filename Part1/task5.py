@@ -64,6 +64,7 @@ def task5():
     cv_var  = np.var(Y, ddof=1)
     reduction = (1 - cv_var / cmc_var) * 100
 
+    print(f'Mean Fraction: {np.mean(X):.4f}%')
     print(f'Theoretical mean lifetime: {mu_Z:.4f} months')
     print(f'CMC estimate: {np.mean(X):.4f}  -  variance: {cmc_var:.6f}')
     print(f'CV  estimate: {np.mean(Y):.4f}  -  variance: {cv_var:.6f}')
