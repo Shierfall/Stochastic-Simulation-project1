@@ -1,72 +1,63 @@
+import matplotlib.pyplot as plt
 import numpy as np
+import math
+import scipy.stats as stats
 
-import numpy as np
-
-Q = np.array([
-    [-0.0085, 0.005 , 0.0025, 0    , 0.001],
-    [0      ,-0.014 , 0.005 , 0.004, 0.005],
-    [0      ,0      ,-0.008 , 0.003, 0.005],
-    [0      ,0      ,0      ,-0.009, 0.009],
-    [0      ,0      ,0      ,0     ,0]
-])
-
-def simulate_event(Q, initial_state=0):
-    current_state = initial_state
-
-    states = [current_state]
-    times_in_states = []
-    total_time = 0.0
-
-    while current_state != 4:   # Death state
-
-        # Time spent in current state
-        rate = -Q[current_state, current_state]
-        waiting_time = np.random.exponential(scale=1/rate)
-
-        times_in_states.append(waiting_time)
-        total_time += waiting_time
-
-        # Transition probabilities
-        probs = Q[current_state].copy()
-        probs[current_state] = 0
-        probs /= rate
-
-        # Move to next state
-        current_state = np.random.choice(len(Q), p=probs)
-        states.append(current_state)
-
-    return states, times_in_states, total_time
-
-states, times_in_states, lifetime = simulate_event(Q)
-
-
-
-def simulate_patients(Q, num_patients, initial_state):
+Q = np.array([[-0.0085, 0.005,  0.0025, 0,      0.001],
+     [0,       -0.014, 0.005,  0.004,  0.005],
+     [0,        0,     -0.008, 0.003,  0.005],
+     [0,        0,      0,     -0.009, 0.009],
+     [0,        0,      0,      0,      0    ]])
+DEATH = 4
+N_STATES = len(Q)
+rng = np.random.default_rng(134214)
+def simulate_ctmc(Q, n_women, rng, start=0):
+    lifetimes = np.zeros(n_women)
     all_states = []
-    all_times = []
-    all_total_times = []
-
-    for _ in range(num_patients):
-        states, times, total_time = simulate_event(Q, initial_state)
-
+    all_times  = []
+    for i in range(n_women):
+        states, times = [], []
+        t, state = 0.0, start
+        while state != DEATH:
+            states.append(state)
+            times.append(t)
+            rate_out = -Q[state, state]
+            t += rng.exponential(1.0 / rate_out)
+            probs = Q[state].copy(); probs[state] = 0.0
+            state = rng.choice(N_STATES, p=probs / rate_out)
         all_states.append(states)
-        all_times.append(times)
-        all_total_times.append(total_time)
+        all_times.append(np.array(times))
+        lifetimes[i] = t
+    return lifetimes, all_states, all_times
 
-    return all_states, all_times, all_total_times
+def task7():
 
-#task7
-n = 1000
-count = 0
+    number_people = 100000
+    lifetimes, all_states, all_times = simulate_ctmc(Q, number_people, rng)
+    print(f"lifetimes x: {lifetimes}")
+    print(50 * '-')
+    mean_lifetime = np.mean(lifetimes)
+    print(f"Mean lifetime: {mean_lifetime}")
+    std_lifetime = np.std(lifetimes)
+    print(f"Standard deviation of lifetime: {std_lifetime}")
+    print(50*'-')
+    CI = stats.norm.interval(0.95, loc=mean_lifetime, scale=std_lifetime/np.sqrt(number_people))
+    print(f"95% Confidence Interval for mean lifetime: {CI[0]} - {CI[1]}")
+    print(50*'-')
+    distant_count = 0
+    for lifetime, states, times in zip(lifetimes, all_states, all_times):
+        if lifetime > 30.5:
+            idx = np.searchsorted(times, 30.5, side='right') - 1
+            if states[idx] in (2, 3):
+                distant_count += 1
+    print(f'Proportion with distant recurrence at 30.5 months: {distant_count / number_people:.4f}')
+    plt.hist(lifetimes, bins=30, density=True, alpha=0.6, color='g', edgecolor='black')
+    plt.title('Histogram of Simulated Lifetimes')
+    plt.xlabel('Lifetime')
+    plt.ylabel('Density')
+    plt.grid()
+    plt.show()
 
-for _ in range(n):
-    states, times, _ = simulate_event(Q)
 
-    # Did the patient enter state 2 before 30.5 months?
-    if any(state == 2 and t <= 30.5
-           for state, t in zip(states, times)):
-        count += 1
-
-proportion = count / n
-
-print(proportion)
+if __name__ == '__main__':
+    print(task7())
