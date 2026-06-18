@@ -40,6 +40,7 @@ def task8():
     ax.set_ylabel('F(t)')
     ax.set_title('Task 8: Empirical vs Theoretical Lifetime CDF')
     ax.legend()
+    plt.grid()
     plt.tight_layout()
     plt.show()
 
