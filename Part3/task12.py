@@ -95,3 +95,92 @@ print(f"\nAll time series end in state 5 (death)? {all_end_in_death}")
 np.save("task12_observations.npy", np.array(all_observations, dtype=object), allow_pickle=True)
 print("\nObservations saved to task12_observations.npy (for use in Task 13)")
 
+
+
+
+lifetimes = np.array([traj[-1][0] for traj in all_trajectories])
+n_observations = np.array([len(obs) for obs in all_observations])
+ 
+# =============================================================================
+# Plot 1: Histogram of true lifetimes across all 1000 women
+# =============================================================================
+fig, axes = plt.subplots(2, 2, figsize=(13, 9))
+ 
+ax = axes[0, 0]
+ax.hist(lifetimes, bins=30, color='steelblue', edgecolor='white', linewidth=0.5)
+ax.axvline(lifetimes.mean(), color='tomato', linestyle='--',
+           label=f"Mean = {lifetimes.mean():.0f} mo")
+ax.set_xlabel("True lifetime (months)")
+ax.set_ylabel("Number of women")
+ax.set_title("True lifetime distribution (1000 women)")
+ax.legend()
+ 
+# =============================================================================
+# Plot 2: Number of checkup observations per woman
+# =============================================================================
+ax = axes[0, 1]
+max_obs = n_observations.max()
+ax.hist(n_observations, bins=np.arange(1, max_obs + 2) - 0.5,
+        color='seagreen', edgecolor='white', linewidth=0.5)
+ax.set_xlabel("Number of checkup observations")
+ax.set_ylabel("Number of women")
+ax.set_title("Checkups per woman (every 48 months)")
+ax.set_xticks(range(1, max_obs + 1, 2))
+ 
+# =============================================================================
+# Plot 3: Overlaid sample of individual trajectories (true vs observed)
+# =============================================================================
+ax = axes[1, 0]
+sample_idx = rng.choice(N, size=25, replace=False)
+for i in sample_idx:
+    traj = all_trajectories[i]
+    times = [t for t, s in traj]
+    states = [s for t, s in traj]
+    # step plot
+    ax.step(times, states, where='post', alpha=0.3, color='steelblue', linewidth=1)
+ax.set_xlabel("Time (months)")
+ax.set_ylabel("State")
+ax.set_yticks(range(5))
+ax.set_yticklabels(["1: none", "2: local", "3: distant", "4: both", "5: death"])
+ax.set_title("Sample of 25 true trajectories")
+ax.set_xlim(0, 600)
+ 
+# =============================================================================
+# Plot 4: State distribution at each checkup time across population
+# =============================================================================
+ax = axes[1, 1]
+checkup_times = np.arange(0, 600, 48)
+state_props = np.zeros((len(checkup_times), 5))
+ 
+for idx, ct in enumerate(checkup_times):
+    states_at_ct = []
+    for traj in all_trajectories:
+        if ct <= traj[-1][0]:  # still alive or just died by this checkup
+            states_at_ct.append(state_at_time(traj, ct))
+        else:
+            states_at_ct.append(4)  # already dead
+    counts = np.bincount(states_at_ct, minlength=5)
+    state_props[idx] = counts / N
+ 
+state_names = ["1: none", "2: local", "3: distant", "4: both", "5: death"]
+colors = ['#378ADD', '#1D9E75', '#F2A623', '#D85A30', '#888780']
+bottom = np.zeros(len(checkup_times))
+for s in range(5):
+    ax.bar(checkup_times, state_props[:, s], bottom=bottom, width=40,
+           label=state_names[s], color=colors[s])
+    bottom += state_props[:, s]
+ax.set_xlabel("Time (months)")
+ax.set_ylabel("Proportion of population")
+ax.set_title("State distribution over time (population level)")
+ax.legend(loc='center left', bbox_to_anchor=(1.0, 0.5), fontsize=9)
+ 
+plt.tight_layout()
+plt.savefig("task12_population_visualization.png", dpi=150, bbox_inches='tight')
+plt.show()
+ 
+print("=== Summary ===")
+print(f"Simulated {N} women")
+print(f"Mean lifetime: {lifetimes.mean():.1f} months")
+print(f"Mean checkups per woman: {n_observations.mean():.2f}")
+print(f"Min/Max checkups: {n_observations.min()} / {n_observations.max()}")
+print("\nPlot saved to task12_population_visualization.png")
