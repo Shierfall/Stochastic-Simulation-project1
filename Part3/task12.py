@@ -28,7 +28,7 @@ def simulate_ctmc(Q, n_women, rng, start=0, grid=48):
             probs = Q[state].copy(); probs[state] = 0.0
             state = rng.choice(N_STATES, p=probs / rate_out)
         states.append(DEATH)
-        times.append(t)          # death time
+        times.append(t)# death time
         times = np.array(times)
 
         # sample on grid 0, 48, 96, ... until death is observed
@@ -52,6 +52,7 @@ def simulate_ctmc(Q, n_women, rng, start=0, grid=48):
 def task12():
     lifetimes, all_states, all_times, Y_series = simulate_ctmc(Q, 1000, rng)
     print(Y_series)
+    return Y_series
 
 if __name__ == '__main__':
     task12()
