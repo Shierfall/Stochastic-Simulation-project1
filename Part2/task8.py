@@ -15,18 +15,13 @@ t=200
 Q = Q
 con_pmf(Q,t=t)
 
-def observed(Q,t):
-    count = 0
-    all_states, all_times, all_total_times = simulate_patients_con(Q,1000,initial_state=0)
-    for i in all_total_times:
-        if t > i:
-            count = count + 1
-    return count / len(all_total_times)
+_, _, all_total_times = simulate_patients_con(Q, 1000, initial_state=0)
+all_total_times = np.array(all_total_times)
+t_values = np.arange(int(max(all_total_times)))
 
-
-_, _, all_total_times = simulate_patients_con(Q,1000,initial_state=0)
-theo = [con_pmf(Q,t) for t in range(int(max(all_total_times)))]
-obs = [observed(Q,t) for t in range(int(max(all_total_times)))]
+# Vectorized empirical CDF: fraction of patients with lifetime < t, for all t at once
+obs = np.mean(t_values[:, None] > all_total_times[None, :], axis=1).tolist()
+theo = [con_pmf(Q, t) for t in t_values]
 
 print("*"*50)
 print('Testing with Kolomogorov-smirnov')
