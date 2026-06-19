@@ -1,7 +1,10 @@
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 import math
 import scipy.stats as stats
+
+FIGDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'figures')
 
 Q = np.array([[-0.0085, 0.005,  0.0025, 0,      0.001],
      [0,       -0.014, 0.005,  0.004,  0.005],
@@ -51,11 +54,17 @@ def task7():
             if states[idx] in (2, 3):
                 distant_count += 1
     print(f'Proportion with distant recurrence at 30.5 months: {distant_count / number_people:.4f}')
+    plt.figure(figsize=(9, 5))
     plt.hist(lifetimes, bins=30, density=True, alpha=0.6, color='g', edgecolor='black')
+    plt.axvline(mean_lifetime, color='red', linestyle='--', linewidth=1.5,
+                label=f'mean = {mean_lifetime:.0f} months')
     plt.title('Histogram of Simulated Lifetimes')
     plt.xlabel('Lifetime')
     plt.ylabel('Density')
+    plt.legend()
     plt.grid()
+    plt.tight_layout()
+    plt.savefig(os.path.join(FIGDIR, 'task7.png'), dpi=160)
     plt.show()
 
 

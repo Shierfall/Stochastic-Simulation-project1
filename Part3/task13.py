@@ -1,7 +1,10 @@
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 import math
 import scipy.stats as stats
+
+FIGDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'figures')
 
 Q = np.array([[-0.0085, 0.005,  0.0025, 0,      0.001],
      [0,       -0.014, 0.005,  0.004,  0.005],
@@ -88,6 +91,7 @@ def estimate_Q(Y_series, grid=48, tol=1e-3, max_iter=100, rng=None):
                    [0.0,   0.0,   0.0,  -0.01,  0.01 ],
                    [0.0,   0.0,   0.0,   0.0,   0.0  ]])
 
+    diffs = []
     for it in range(max_iter):
         N_tot = np.zeros((N_STATES, N_STATES))
         S_tot = np.zeros(N_STATES)
@@ -115,16 +119,52 @@ def estimate_Q(Y_series, grid=48, tol=1e-3, max_iter=100, rng=None):
 
         diff = np.max(np.abs(Q_new - Qk))
         Qk = Q_new
+        diffs.append(diff)
         print(f"iter {it}: max|dQ| = {diff:.5f}")
         if diff < tol:
             break
 
-    return Qk
+    return Qk, diffs
 
 def task13():
     lifetimes, all_states, all_times, Y_series = simulate_ctmc(Q, 1000, rng)
-    Q_est = estimate_Q(Y_series, grid=48, tol=1e-3, max_iter=100, rng=rng)
+    Q_est, diffs = estimate_Q(Y_series, grid=48, tol=1e-3, max_iter=100, rng=rng)
     print("Estimated Q:\n", Q_est)
+
+    # convergence plot
+    fig, ax = plt.subplots(figsize=(8, 4.5))
+    ax.semilogy(range(len(diffs)), diffs, color='tab:purple', marker='o',
+                markersize=6, linewidth=1.6)
+    ax.axhline(1e-3, color='tab:orange', linestyle='--', linewidth=1.2,
+               label=r'tolerance $10^{-3}$')
+    ax.set_xlabel('Iteration')
+    ax.set_ylabel('max|dQ|')
+    ax.set_title('Task 13: MCEM convergence')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(os.path.join(FIGDIR, 'task13_convergence.png'), dpi=160)
+
+    # true vs estimated rates
+    pairs = [(0, 1), (0, 2), (0, 4), (1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)]
+    labels = [f'$q_{{{i+1}{j+1}}}$' for i, j in pairs]
+    true_v = [Q[i, j] for i, j in pairs]
+    est_v = [Q_est[i, j] for i, j in pairs]
+    x = np.arange(len(pairs))
+    w = 0.38
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.bar(x - w / 2, true_v, w, color='tab:blue', label='true rate')
+    ax.bar(x + w / 2, est_v, w, color='tab:green', label='MCEM estimate')
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.set_ylabel('Transition rate')
+    ax.set_title('Task 13: Recovered transition rates vs truth')
+    ax.legend()
+    ax.grid(True, alpha=0.3, axis='y')
+    plt.tight_layout()
+    plt.savefig(os.path.join(FIGDIR, 'task13_compare.png'), dpi=160)
+    plt.show()
+    return Q_est
 
 if __name__ == '__main__':
     task13()

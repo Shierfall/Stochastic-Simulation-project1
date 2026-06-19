@@ -1,8 +1,8 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import chi2
 from task7 import simulate_ctmc, Q, rng
-
 Q_treat = np.array([
     [-(0.0025 + 0.00125 + 0.001), 0.0025,  0.00125, 0,     0.001],
     [0,  -(0.002 + 0.005),         0,       0.002,   0.005],
@@ -48,9 +48,17 @@ def task9():
     t_no, S_no = kaplan_meier(lifetimes_no_treat)
     t_tr, S_tr = kaplan_meier(lifetimes_treat)
 
+    med_no = np.median(lifetimes_no_treat)
+    med_tr = np.median(lifetimes_treat)
+
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.step(np.concatenate([[0], t_no]), S_no, where='post', label='No treatment', color='red')
     ax.step(np.concatenate([[0], t_tr]), S_tr, where='post', label='Treatment', linestyle='--', color='blue')
+    ax.axvline(med_no, color='red', linestyle=':', linewidth=1, alpha=0.6)
+    ax.axvline(med_tr, color='blue', linestyle=':', linewidth=1, alpha=0.6)
+    ax.axhline(0.5, color='grey', linestyle=':', linewidth=0.8)
+    ax.text(med_no + 6, 0.52, f'{med_no:.0f} mo', color='red', fontsize=9)
+    ax.text(med_tr + 6, 0.44, f'{med_tr:.0f} mo', color='blue', fontsize=9)
     ax.set_xlabel('Time (months)')
     ax.set_ylabel('S(t)')
     ax.set_title('Task 9: Kaplan-Meier Survival Functions')

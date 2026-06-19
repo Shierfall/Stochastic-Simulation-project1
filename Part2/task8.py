@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import scipy.stats as stats
 import matplotlib.pyplot as plt
@@ -39,6 +40,9 @@ def task8():
     ax.set_xlabel('Lifetime (months)')
     ax.set_ylabel('F(t)')
     ax.set_title('Task 8: Empirical vs Theoretical Lifetime CDF')
+    ax.text(0.97, 0.05, f'KS = {ks_stat:.3f},  p = {p_val:.3f}',
+            transform=ax.transAxes, ha='right', va='bottom',
+            bbox=dict(boxstyle='round', fc='white', ec='grey', alpha=0.8))
     ax.legend()
     plt.grid()
     plt.tight_layout()
