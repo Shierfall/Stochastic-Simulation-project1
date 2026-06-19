@@ -95,21 +95,3 @@ print(f"\nAll time series end in state 5 (death)? {all_end_in_death}")
 np.save("task12_observations.npy", np.array(all_observations, dtype=object), allow_pickle=True)
 print("\nObservations saved to task12_observations.npy (for use in Task 13)")
 
-
-
-lifetimes = np.array([traj[-1][0] for traj in all_trajectories])
-n_observations = np.array([len(obs) for obs in all_observations])
-
-
-fig, axes = plt.subplots(2, 2, figsize=(13, 9))
- 
-ax = axes[0, 0]
-ax.hist(lifetimes, bins=30, color='steelblue', edgecolor='white', linewidth=0.5)
-ax.axvline(lifetimes.mean(), color='tomato', linestyle='--',
-           label=f"Mean = {lifetimes.mean():.0f} mo")
-ax.set_xlabel("True lifetime (months)")
-ax.set_ylabel("Number of women")
-ax.set_title("True lifetime distribution (1000 women)")
-ax.legend()
-
-plt.show()
