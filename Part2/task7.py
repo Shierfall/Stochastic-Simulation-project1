@@ -32,7 +32,7 @@ def simulate_ctmc(Q, n_women, rng, start=0):
 
 def task7():
 
-    number_people = 100000
+    number_people = 1000
     lifetimes, all_states, all_times = simulate_ctmc(Q, number_people, rng)
     print(f"lifetimes x: {lifetimes}")
     print(50 * '-')
